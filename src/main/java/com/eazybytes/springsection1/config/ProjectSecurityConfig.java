@@ -31,9 +31,10 @@ public class ProjectSecurityConfig {
 //                .requestMatchers("/myAccount","/myLoans","/myCards","/myLoans","/myPaisa").authenticated()
 //                .requestMatchers("/myNotices","/myContact","/checkJpa").permitAll());
 
-        http.authorizeHttpRequests((requests) -> requests
+        http.csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests((requests) -> requests
                 .requestMatchers("/myAccount","/myLoans","/myCards","/myLoans","/myPaisa","/myBalance").authenticated()
-                .requestMatchers("/myNotices","/myContact","/checkJpa","/error").permitAll());
+                .requestMatchers("/myNotices","/myContact","/checkJpa","/error","/registerUser").permitAll());
 
         http.formLogin(withDefaults());
         http.httpBasic(withDefaults());
@@ -50,11 +51,11 @@ public class ProjectSecurityConfig {
 //       return new InMemoryUserDetailsManager(user,admin);
 //    }
 
-    @Bean
-    public UserDetailsService userDetailsService(DataSource dataSource)
-    {
-        return new JdbcUserDetailsManager(dataSource);
-    }
+//    @Bean
+//    public UserDetailsService userDetailsService(DataSource dataSource)
+//    {
+//        return new JdbcUserDetailsManager(dataSource);
+//    }
 
     @Bean
     public PasswordEncoder passwordEncoder()
