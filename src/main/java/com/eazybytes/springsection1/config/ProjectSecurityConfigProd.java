@@ -1,5 +1,6 @@
 package com.eazybytes.springsection1.config;
 
+import com.eazybytes.springsection1.ExceptionHandler.CustomBasicAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -23,13 +24,14 @@ public class ProjectSecurityConfigProd {
 //                .requestMatchers("/myAccount","/myLoans","/myCards","/myLoans","/myPaisa").authenticated()
 //                .requestMatchers("/myNotices","/myContact","/checkJpa").permitAll());
 
-        http.csrf(csrf -> csrf.disable())
+        http.requiresChannel(rcc->rcc.anyRequest().requiresSecure())
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((requests) -> requests
                 .requestMatchers("/myAccount","/myLoans","/myCards","/myLoans","/myPaisa","/myBalance").authenticated()
                 .requestMatchers("/myNotices","/myContact","/checkJpa","/error","/registerUser").permitAll());
 
         http.formLogin(withDefaults());
-        http.httpBasic(withDefaults());
+        http.httpBasic(hbc-> hbc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()));
         return http.build();
     }
 
