@@ -23,7 +23,7 @@ public class CustomBasicAuthenticationEntryPoint implements AuthenticationEntryP
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
 
         response.setContentType("application/json;charset=UTF-8");
-        LocalDateTime currentTimeStamp=LocalDateTime.now();
+        LocalDateTime currentTimeStamp =LocalDateTime.now();
         String jsonResponse=
                 String.format("{\"timestamp\":\"%s\",\"status\":%d,\"error\":\"%s\",\"message\":\"%s\",\"path\":\"%s\"}",
                         currentTimeStamp,HttpStatus.UNAUTHORIZED.value(),HttpStatus.UNAUTHORIZED.getReasonPhrase(),message,path);
