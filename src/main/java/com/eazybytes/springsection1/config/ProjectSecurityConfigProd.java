@@ -2,7 +2,7 @@ package com.eazybytes.springsection1.config;
 
 import com.eazybytes.springsection1.ExceptionHandler.CustomAccessDeniedHandler;
 import com.eazybytes.springsection1.ExceptionHandler.CustomBasicAuthenticationEntryPoint;
-import com.eazybytes.springsection1.filter.CsrfCookieFilter;
+import com.eazybytes.springsection1.filter.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +20,7 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -37,8 +38,7 @@ public class ProjectSecurityConfigProd {
         CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler = new CsrfTokenRequestAttributeHandler();
 
         http
-                .securityContext(contextConfig -> contextConfig.requireExplicitSave(false))
-                .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
+                .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .cors(corsConfig -> corsConfig.configurationSource(new CorsConfigurationSource() {
                     @Override
@@ -49,6 +49,7 @@ public class ProjectSecurityConfigProd {
                         config.setAllowedOrigins(Collections.singletonList("https://localhost:4200"));
                         config.setAllowedMethods(Collections.singletonList("*"));
                         config.setAllowCredentials(true);
+                        config.setExposedHeaders(Arrays.asList("Authorization"));
                         config.setAllowedHeaders(Collections.singletonList("*"));
                         config.setMaxAge(3600L);
                         return config;
@@ -58,6 +59,10 @@ public class ProjectSecurityConfigProd {
                         .ignoringRequestMatchers( "/contact","/register")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
+                .addFilterBefore(new RequestValidationBeforeFilter(),BasicAuthenticationFilter.class)
+                .addFilterAfter(new AuthoritiesLoggingAfterFilter(),BasicAuthenticationFilter.class)
+                .addFilterAfter(new JWTTokenGenerationFilter(),BasicAuthenticationFilter.class)
+                .addFilterBefore(new JWTTokenValidationFilter(),BasicAuthenticationFilter.class)
                 .requiresChannel(rcc->rcc.anyRequest().requiresSecure())
                 .authorizeHttpRequests((requests) -> requests
                         //                        .requestMatchers("/myAccount").hasAuthority("VIEWACCOUNT")
