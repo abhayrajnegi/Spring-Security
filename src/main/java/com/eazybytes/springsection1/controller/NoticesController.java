@@ -38,9 +38,10 @@ public class NoticesController {
     @Autowired
     private  NoticeRepository noticeRepository;
 
-    @GetMapping("/notices")
+    @GetMapping("/'notices'")
     public ResponseEntity<List<Notice>> getNotices() {
         List<Notice> notices = noticeRepository.findAllActiveNotices();
+        System.out.println("notices: " + notices);
         if (notices != null) {
             return ResponseEntity.ok()
                     .cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS))
